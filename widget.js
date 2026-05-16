@@ -1,4 +1,4 @@
-window.addEventListener("DOMContentLoaded", () => {
+function initWidget() {
 
   const currentScript =
     document.querySelector(
@@ -638,4 +638,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
   }
 
-});
+}
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initWidget
+  );
+
+} else {
+
+  initWidget();
+
+}
