@@ -1,26 +1,57 @@
 window.addEventListener("DOMContentLoaded", () => {
 
   const currentScript =
-    document.currentScript;
+    document.querySelector(
+      'script[data-business]'
+    );
 
   const businessId =
-    currentScript?.getAttribute(
-      "data-business"
-    ) || "777luckydraws";
+    currentScript
+      ? currentScript.getAttribute(
+          "data-business"
+        )
+      : "777luckydraws";
 
   let settings = null;
+
+  const API_URL =
+    "https://seven77luckydraws-ai.onrender.com";
 
   // LOAD SETTINGS
 
   fetch(
-    `http://localhost:3000/settings?businessId=${businessId}`
+    `${API_URL}/settings?businessId=${businessId}`
   )
   .then((response) => response.json())
   .then((data) => {
 
+    console.log(data);
+
+    if (
+      !data ||
+      !data.business_name
+    ) {
+
+      alert(
+        "Business settings failed to load."
+      );
+
+      return;
+
+    }
+
     settings = data;
 
     startWidget();
+
+  })
+  .catch((error) => {
+
+    console.log(error);
+
+    alert(
+      "Failed to connect to server."
+    );
 
   });
 
@@ -39,21 +70,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
 <div id="chat-widget" class="closed">
 
-  <!-- HEADER -->
-
   <div id="chat-header">
 
-    <span>
-      ${settings.business_name} AI
-    </span>
+    <div id="header-left">
+
+      <div id="online-dot"></div>
+
+      <span>
+        ${settings.business_name} AI
+      </span>
+
+    </div>
 
     <button id="close-chat">
       ✕
     </button>
 
   </div>
-
-  <!-- WELCOME -->
 
   <div id="welcome-screen">
 
@@ -75,8 +108,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   </div>
 
-  <!-- CHAT -->
-
   <div id="chat-container">
 
     <div id="chat-messages">
@@ -87,13 +118,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     </div>
 
-    <!-- TYPING -->
-
     <div id="typing-indicator">
-      AI is typing...
-    </div>
 
-    <!-- BOTTOM -->
+      <span></span>
+      <span></span>
+      <span></span>
+
+    </div>
 
     <div id="bottom-area">
 
@@ -151,15 +182,7 @@ window.addEventListener("DOMContentLoaded", () => {
   z-index: 999999;
 
   box-shadow:
-    0 0 20px rgba(0,0,0,0.4);
-
-  transition: 0.3s;
-
-}
-
-#chat-button:hover {
-
-  transform: scale(1.08);
+    0 0 25px rgba(0,0,0,0.35);
 
 }
 
@@ -186,9 +209,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   z-index: 999999;
 
-  box-shadow:
-    0 0 30px rgba(0,0,0,0.4);
-
 }
 
 #chat-widget.closed {
@@ -206,14 +226,31 @@ window.addEventListener("DOMContentLoaded", () => {
 
   padding: 15px;
 
-  font-weight: bold;
-
   display: flex;
 
   justify-content: space-between;
   align-items: center;
 
-  flex-shrink: 0;
+}
+
+#header-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+#online-dot {
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
 
 }
 
@@ -242,23 +279,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   text-align: center;
 
-  padding: 30px;
-
   color: white;
 
-}
-
-#welcome-content h2 {
-
-  margin-bottom: 10px;
-
-}
-
-#welcome-content p {
-
-  margin-bottom: 20px;
-
-  color: #d1d5db;
+  padding: 30px;
 
 }
 
@@ -291,8 +314,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   overflow: hidden;
 
-  min-height: 0;
-
 }
 
 #chat-messages {
@@ -301,19 +322,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   overflow-y: auto;
 
-  overflow-x: hidden;
-
   padding: 15px;
 
   color: white;
-
-  display: flex;
-
-  flex-direction: column;
-
-  scroll-behavior: smooth;
-
-  min-height: 0;
 
 }
 
@@ -328,8 +339,6 @@ window.addEventListener("DOMContentLoaded", () => {
   max-width: 85%;
 
   line-height: 1.4;
-
-  word-wrap: break-word;
 
 }
 
@@ -352,17 +361,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   display: none;
 
-  padding: 0 15px 10px;
+  padding: 10px 15px;
 
-  font-size: 13px;
-
-  color: #9ca3af;
+  color: white;
 
 }
 
 #bottom-area {
-
-  flex-shrink: 0;
 
   background: #1f2937;
 
@@ -413,20 +418,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 }
 
-#chat-send:hover {
-
-  opacity: 0.9;
-
-}
-
-#chat-send:disabled {
-
-  opacity: 0.5;
-
-  cursor: not-allowed;
-
-}
-
 #chat-footer {
 
   text-align: center;
@@ -438,39 +429,6 @@ window.addEventListener("DOMContentLoaded", () => {
   color: #9ca3af;
 
   background: #0f172a;
-
-}
-
-@media (max-width: 600px) {
-
-  #chat-widget {
-
-    width: 100%;
-
-    height: 100%;
-
-    bottom: 0;
-    right: 0;
-
-    border-radius: 0;
-
-  }
-
-  #chat-button {
-
-    width: 60px;
-    height: 60px;
-
-    bottom: 15px;
-    right: 15px;
-
-  }
-
-  .message {
-
-    max-width: 92%;
-
-  }
 
 }
 
@@ -532,7 +490,7 @@ window.addEventListener("DOMContentLoaded", () => {
         "typing-indicator"
       );
 
-    // OPEN CHAT
+    // OPEN
 
     chatButton.onclick = () => {
 
@@ -545,7 +503,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     };
 
-    // CLOSE CHAT
+    // CLOSE
 
     closeButton.onclick = () => {
 
@@ -568,6 +526,8 @@ window.addEventListener("DOMContentLoaded", () => {
       chatContainer.style.display =
         "flex";
 
+      input.focus();
+
     };
 
     // SEND MESSAGE
@@ -589,23 +549,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
       input.value = "";
 
-      button.disabled = true;
-
       typingIndicator.style.display =
         "block";
 
-      setTimeout(() => {
-
-        messages.scrollTop =
-          messages.scrollHeight;
-
-      }, 50);
+      messages.scrollTop =
+        messages.scrollHeight;
 
       try {
 
         const response =
           await fetch(
-            "http://localhost:3000/chat",
+            `${API_URL}/chat`,
             {
               method: "POST",
 
@@ -617,7 +571,6 @@ window.addEventListener("DOMContentLoaded", () => {
               body: JSON.stringify({
 
                 message,
-
                 businessId,
 
                 userEmail:
@@ -634,22 +587,21 @@ window.addEventListener("DOMContentLoaded", () => {
         typingIndicator.style.display =
           "none";
 
+        const aiReply =
+          data.reply ||
+          data.error ||
+          "AI failed to respond.";
+
         messages.innerHTML += `
 
           <div class="message ai">
-            ${data.reply}
+            ${aiReply}
           </div>
 
         `;
 
-        button.disabled = false;
-
-        setTimeout(() => {
-
-          messages.scrollTop =
-            messages.scrollHeight;
-
-        }, 50);
+        messages.scrollTop =
+          messages.scrollHeight;
 
       } catch (error) {
 
@@ -658,18 +610,16 @@ window.addEventListener("DOMContentLoaded", () => {
         typingIndicator.style.display =
           "none";
 
-        button.disabled = false;
-
       }
 
     }
 
-    // BUTTON CLICK
+    // BUTTON
 
     button.onclick =
       sendMessage;
 
-    // ENTER KEY
+    // ENTER
 
     input.addEventListener(
       "keypress",

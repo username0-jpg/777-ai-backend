@@ -341,7 +341,7 @@ app.post("/create-business", async (req, res) => {
     const widgetCode = `
 
 <script
-  src="http://localhost:5500/widget.js"
+  src="https://777-ai-widget.vercel.app/widget.js"
   data-business="${businessId}"
 ></script>
 
