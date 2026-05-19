@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    777 AI Login
+  </title>
+
+  <!-- SUPABASE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="./auth.js"></script>
+
+  <style>
+
+    * {
+
+      margin: 0;
+      padding: 0;
+
+      box-sizing: border-box;
+
+      font-family:
+        Arial,
+        sans-serif;
+
+    }
+
+    body {
+
+      background:
+        linear-gradient(
+          135deg,
+          #0f172a,
+          #111827,
+          #1e293b
+        );
+
+      min-height: 100vh;
+
+      display: flex;
+
+      justify-content: center;
+      align-items: center;
+
+      padding: 20px;
+
+      overflow: hidden;
+
+    }
+
+    .background-glow {
+
+      position: absolute;
+
+      width: 500px;
+      height: 500px;
+
+      background:
+        rgba(220, 38, 38, 0.18);
+
+      filter: blur(120px);
+
+      border-radius: 50%;
+
+      top: -100px;
+      right: -100px;
+
+      z-index: 0;
+
+    }
+
+    .auth-container {
+
+      position: relative;
+
+      z-index: 2;
+
+      width: 100%;
+      max-width: 430px;
+
+      background:
+        rgba(17, 24, 39, 0.92);
+
+      backdrop-filter:
+        blur(15px);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 28px;
+
+      padding: 40px;
+
+      box-shadow:
+        0 0 50px rgba(0,0,0,0.45);
+
+      animation:
+        fadeIn 0.5s ease;
+
+    }
+
+    .logo {
+
+      width: 75px;
+      height: 75px;
+
+      border-radius: 20px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #dc2626,
+          #ef4444
+        );
+
+      display: flex;
+
+      justify-content: center;
+      align-items: center;
+
+      margin: auto;
+
+      margin-bottom: 25px;
+
+      font-size: 34px;
+
+      color: white;
+
+      box-shadow:
+        0 0 25px rgba(220,38,38,0.45);
+
+    }
+
+    h1 {
+
+      color: white;
+
+      text-align: center;
+
+      margin-bottom: 10px;
+
+      font-size: 32px;
+
+    }
+
+    .subtitle {
+
+      text-align: center;
+
+      color: #9ca3af;
+
+      margin-bottom: 35px;
+
+      font-size: 15px;
+
+    }
+
+    .tabs {
+
+      display: flex;
+
+      background: #0f172a;
+
+      border-radius: 14px;
+
+      padding: 5px;
+
+      margin-bottom: 25px;
+
+    }
+
+    .tab {
+
+      flex: 1;
+
+      padding: 12px;
+
+      border-radius: 10px;
+
+      border: none;
+
+      background: transparent;
+
+      color: #9ca3af;
+
+      cursor: pointer;
+
+      font-weight: bold;
+
+      transition: 0.25s;
+
+    }
+
+    .tab.active {
+
+      background: #dc2626;
+
+      color: white;
+
+    }
+
+    .form-group {
+
+      margin-bottom: 18px;
+
+    }
+
+    input {
+
+      width: 100%;
+
+      padding: 16px;
+
+      border-radius: 14px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      background: #1f2937;
+
+      color: white;
+
+      outline: none;
+
+      font-size: 15px;
+
+      transition: 0.25s;
+
+    }
+
+    input:focus {
+
+      border-color: #dc2626;
+
+      box-shadow:
+        0 0 0 3px rgba(220,38,38,0.15);
+
+    }
+
+    .main-btn {
+
+      width: 100%;
+
+      padding: 16px;
+
+      border: none;
+
+      border-radius: 14px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #dc2626,
+          #ef4444
+        );
+
+      color: white;
+
+      font-size: 15px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      transition: 0.25s;
+
+      margin-top: 8px;
+
+    }
+
+    .main-btn:hover {
+
+      transform: translateY(-2px);
+
+      opacity: 0.95;
+
+    }
+
+    .divider {
+
+      text-align: center;
+
+      color: #6b7280;
+
+      margin: 25px 0;
+
+      position: relative;
+
+    }
+
+    .divider::before {
+
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      top: 50%;
+
+      width: 42%;
+
+      height: 1px;
+
+      background: #374151;
+
+    }
+
+    .divider::after {
+
+      content: "";
+
+      position: absolute;
+
+      right: 0;
+      top: 50%;
+
+      width: 42%;
+
+      height: 1px;
+
+      background: #374151;
+
+    }
+
+    .google-btn {
+
+      width: 100%;
+
+      padding: 15px;
+
+      border-radius: 14px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      background: #111827;
+
+      color: white;
+
+      cursor: pointer;
+
+      font-weight: bold;
+
+      transition: 0.25s;
+
+    }
+
+    .google-btn:hover {
+
+      background: #1f2937;
+
+    }
+
+    .footer {
+
+      margin-top: 30px;
+
+      text-align: center;
+
+      color: #6b7280;
+
+      font-size: 13px;
+
+    }
+
+    @keyframes fadeIn {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateY(15px);
+
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="background-glow"></div>
+
+  <div class="auth-container">
+
+    <div class="logo">
+      🤖
+    </div>
+
+    <h1>
+      777 AI
+    </h1>
+
+    <p class="subtitle">
+      AI SaaS Platform Login
+    </p>
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        id="loginTab"
+      >
+        Login
+      </button>
+
+      <button
+        class="tab"
+        id="signupTab"
+      >
+        Sign Up
+      </button>
+
+    </div>
+
+    <div class="form-group">
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Email Address"
+      />
+
+    </div>
+
+    <div class="form-group">
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Password"
+      />
+
+    </div>
+
+    <button
+      class="main-btn"
+      id="submitBtn"
+    >
+      Login
+    </button>
+
+    <div class="divider">
+      OR
+    </div>
+
+    <button
+      class="google-btn"
+      onclick="googleLogin()"
+    >
+      Continue with Google
+    </button>
+
+    <div class="footer">
+
+      Powered by
+      777LuckyDrawsLTD
+
+    </div>
+
+  </div>
+
+  <script>
+
+    let isLogin = true;
+
+    const loginTab =
+      document.getElementById(
+        "loginTab"
+      );
+
+    const signupTab =
+      document.getElementById(
+        "signupTab"
+      );
+
+    const submitBtn =
+      document.getElementById(
+        "submitBtn"
+      );
+
+    // SWITCH TABS
+
+    loginTab.onclick = () => {
+
+      isLogin = true;
+
+      loginTab.classList.add(
+        "active"
+      );
+
+      signupTab.classList.remove(
+        "active"
+      );
+
+      submitBtn.innerText =
+        "Login";
+
+    };
+
+    signupTab.onclick = () => {
+
+      isLogin = false;
+
+      signupTab.classList.add(
+        "active"
+      );
+
+      loginTab.classList.remove(
+        "active"
+      );
+
+      submitBtn.innerText =
+        "Create Account";
+
+    };
+
+    // SUBMIT
+
+    submitBtn.onclick = async () => {
+
+      const email =
+        document.getElementById(
+          "email"
+        ).value;
+
+      const password =
+        document.getElementById(
+          "password"
+        ).value;
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        alert(
+          "Please complete all fields."
+        );
+
+        return;
+
+      }
+
+      submitBtn.disabled = true;
+
+      submitBtn.innerText =
+        "Loading...";
+
+      try {
+
+        if (isLogin) {
+
+          await login(
+            email,
+            password
+          );
+
+        } else {
+
+          await signUp(
+            email,
+            password
+          );
+
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+      submitBtn.disabled = false;
+
+      submitBtn.innerText =
+        isLogin
+          ? "Login"
+          : "Create Account";
+
+    };
+
+  </script>
+
+</body>
+
+</html>

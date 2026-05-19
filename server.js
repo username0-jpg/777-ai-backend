@@ -19,8 +19,10 @@ app.use(express.json());
 // OPENAI
 
 const openai = new OpenAI({
+
   apiKey:
-    process.env.OPENAI_API_KEY,
+    process.env.OPENAI_API_KEY
+
 });
 
 // SUPABASE
@@ -89,6 +91,7 @@ app.post("/chat", async (req, res) => {
         .from("leads")
         .insert([
           {
+
             email:
               emailMatch[0],
 
@@ -100,6 +103,7 @@ app.post("/chat", async (req, res) => {
 
             user_email:
               userEmail
+
           }
         ]);
 
@@ -115,6 +119,7 @@ app.post("/chat", async (req, res) => {
         messages: [
 
           {
+
             role: "system",
 
             content: `
@@ -132,13 +137,16 @@ Rules:
 - if unsure tell user to contact support
 
 `
+
           },
 
           {
+
             role: "user",
 
             content:
               userMessage
+
           }
 
         ]
@@ -186,6 +194,50 @@ Rules:
 
       error:
         "Something went wrong"
+
+    });
+
+  }
+
+});
+
+// GET USER BUSINESS
+
+app.get("/my-business", async (req, res) => {
+
+  try {
+
+    const userEmail =
+      req.query.userEmail;
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from("business_settings")
+      .select("*")
+      .eq(
+        "user_email",
+        userEmail
+      )
+      .single();
+
+    if (error) {
+
+      throw error;
+
+    }
+
+    res.json(data);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+
+      error:
+        "Business not found"
 
     });
 
