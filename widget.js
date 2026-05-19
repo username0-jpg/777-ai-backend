@@ -184,6 +184,14 @@ function initWidget() {
   box-shadow:
     0 0 25px rgba(0,0,0,0.35);
 
+  transition: 0.3s;
+
+}
+
+#chat-button:hover {
+
+  transform: scale(1.08);
+
 }
 
 #chat-widget {
@@ -209,6 +217,9 @@ function initWidget() {
 
   z-index: 999999;
 
+  box-shadow:
+    0 0 35px rgba(0,0,0,0.4);
+
 }
 
 #chat-widget.closed {
@@ -231,6 +242,8 @@ function initWidget() {
   justify-content: space-between;
   align-items: center;
 
+  font-weight: bold;
+
 }
 
 #header-left {
@@ -251,6 +264,9 @@ function initWidget() {
   border-radius: 50%;
 
   background: #22c55e;
+
+  box-shadow:
+    0 0 10px #22c55e;
 
 }
 
@@ -282,6 +298,20 @@ function initWidget() {
   color: white;
 
   padding: 30px;
+
+}
+
+#welcome-content h2 {
+
+  margin-bottom: 10px;
+
+}
+
+#welcome-content p {
+
+  margin-bottom: 20px;
+
+  color: #d1d5db;
 
 }
 
@@ -322,9 +352,13 @@ function initWidget() {
 
   overflow-y: auto;
 
+  overflow-x: hidden;
+
   padding: 15px;
 
   color: white;
+
+  scroll-behavior: smooth;
 
 }
 
@@ -339,6 +373,11 @@ function initWidget() {
   max-width: 85%;
 
   line-height: 1.4;
+
+  word-wrap: break-word;
+
+  animation:
+    fadeIn 0.25s ease;
 
 }
 
@@ -361,9 +400,77 @@ function initWidget() {
 
   display: none;
 
-  padding: 10px 15px;
+  align-items: center;
 
-  color: white;
+  gap: 6px;
+
+  padding: 12px 15px;
+
+}
+
+#typing-indicator span {
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #9ca3af;
+
+  animation:
+    typingBounce 1.2s infinite ease-in-out;
+
+}
+
+#typing-indicator span:nth-child(2) {
+
+  animation-delay: 0.2s;
+
+}
+
+#typing-indicator span:nth-child(3) {
+
+  animation-delay: 0.4s;
+
+}
+
+@keyframes typingBounce {
+
+  0%, 80%, 100% {
+
+    transform: scale(0.7);
+
+    opacity: 0.5;
+
+  }
+
+  40% {
+
+    transform: scale(1);
+
+    opacity: 1;
+
+  }
+
+}
+
+@keyframes fadeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(10px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+  }
 
 }
 
@@ -397,6 +504,8 @@ function initWidget() {
 
   color: white;
 
+  outline: none;
+
 }
 
 #chat-send {
@@ -415,6 +524,22 @@ function initWidget() {
   cursor: pointer;
 
   font-weight: bold;
+
+  transition: 0.2s;
+
+}
+
+#chat-send:hover {
+
+  opacity: 0.9;
+
+}
+
+#chat-send:disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
 
 }
 
@@ -490,7 +615,7 @@ function initWidget() {
         "typing-indicator"
       );
 
-    // OPEN
+    // OPEN CHAT
 
     chatButton.onclick = () => {
 
@@ -503,7 +628,7 @@ function initWidget() {
 
     };
 
-    // CLOSE
+    // CLOSE CHAT
 
     closeButton.onclick = () => {
 
@@ -550,7 +675,12 @@ function initWidget() {
       input.value = "";
 
       typingIndicator.style.display =
-        "block";
+        "flex";
+
+      button.disabled = true;
+
+      button.innerHTML =
+        "...";
 
       messages.scrollTop =
         messages.scrollHeight;
@@ -587,6 +717,11 @@ function initWidget() {
         typingIndicator.style.display =
           "none";
 
+        button.disabled = false;
+
+        button.innerHTML =
+          "Send";
+
         const aiReply =
           data.reply ||
           data.error ||
@@ -610,16 +745,21 @@ function initWidget() {
         typingIndicator.style.display =
           "none";
 
+        button.disabled = false;
+
+        button.innerHTML =
+          "Send";
+
       }
 
     }
 
-    // BUTTON
+    // BUTTON CLICK
 
     button.onclick =
       sendMessage;
 
-    // ENTER
+    // ENTER KEY
 
     input.addEventListener(
       "keypress",
