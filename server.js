@@ -4,8 +4,9 @@ const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
 
-const { createClient } =
-  require("@supabase/supabase-js");
+const {
+  createClient
+} = require("@supabase/supabase-js");
 
 const app = express();
 
@@ -18,7 +19,8 @@ app.use(express.json());
 // OPENAI
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey:
+    process.env.OPENAI_API_KEY,
 });
 
 // SUPABASE
@@ -87,10 +89,17 @@ app.post("/chat", async (req, res) => {
         .from("leads")
         .insert([
           {
-            email: emailMatch[0],
-            message: userMessage,
-            business_id: businessId,
-            user_email: userEmail
+            email:
+              emailMatch[0],
+
+            message:
+              userMessage,
+
+            business_id:
+              businessId,
+
+            user_email:
+              userEmail
           }
         ]);
 
@@ -127,18 +136,45 @@ Rules:
 
           {
             role: "user",
-            content: userMessage
+
+            content:
+              userMessage
           }
 
         ]
 
       });
 
+    const aiReply =
+      completion.choices?.[0]
+      ?.message?.content
+      || "No AI response";
+
+    // SAVE CHAT HISTORY
+
+    await supabase
+      .from("chat_logs")
+      .insert([
+        {
+
+          business_id:
+            businessId,
+
+          user_message:
+            userMessage,
+
+          ai_reply:
+            aiReply
+
+        }
+      ]);
+
+    // SEND RESPONSE
+
     res.json({
 
       reply:
-        completion.choices?.[0]?.message?.content
-        || "No AI response"
+        aiReply
 
     });
 
@@ -147,7 +183,10 @@ Rules:
     console.log(error);
 
     res.status(500).json({
-      error: "Something went wrong"
+
+      error:
+        "Something went wrong"
+
     });
 
   }
@@ -175,7 +214,9 @@ app.get("/leads", async (req, res) => {
       )
       .order(
         "created_at",
-        { ascending: false }
+        {
+          ascending: false
+        }
       );
 
     if (error) {
@@ -192,6 +233,52 @@ app.get("/leads", async (req, res) => {
 
     res.status(500).send(
       "Error loading leads"
+    );
+
+  }
+
+});
+
+// GET CHAT LOGS
+
+app.get("/chat-logs", async (req, res) => {
+
+  try {
+
+    const businessId =
+      req.query.businessId;
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from("chat_logs")
+      .select("*")
+      .eq(
+        "business_id",
+        businessId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+    if (error) {
+
+      throw error;
+
+    }
+
+    res.json(data);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).send(
+      "Error loading chats"
     );
 
   }
@@ -246,10 +333,12 @@ app.post("/settings", async (req, res) => {
   try {
 
     const {
+
       businessId,
       businessName,
       aiPrompt,
       primaryColor
+
     } = req.body;
 
     const {
@@ -280,7 +369,9 @@ app.post("/settings", async (req, res) => {
     }
 
     res.json({
+
       success: true
+
     });
 
   } catch (error) {
@@ -302,11 +393,13 @@ app.post("/create-business", async (req, res) => {
   try {
 
     const {
+
       businessId,
       businessName,
       userEmail,
       aiPrompt,
       primaryColor
+
     } = req.body;
 
     const {
@@ -315,6 +408,7 @@ app.post("/create-business", async (req, res) => {
       .from("business_settings")
       .insert([
         {
+
           business_id:
             businessId,
 
@@ -329,6 +423,7 @@ app.post("/create-business", async (req, res) => {
 
           primary_color:
             primaryColor
+
         }
       ]);
 
@@ -341,7 +436,7 @@ app.post("/create-business", async (req, res) => {
     const widgetCode = `
 
 <script
-  src="https://777-ai-widget.vercel.app/widget.js"
+  src="https://777-ai-backend.vercel.app/widget.js"
   data-business="${businessId}"
 ></script>
 
@@ -360,8 +455,10 @@ app.post("/create-business", async (req, res) => {
     console.log(error);
 
     res.status(500).json({
+
       error:
         "Error creating business"
+
     });
 
   }
@@ -379,11 +476,19 @@ app.get("/test-supabase", async (req, res) => {
     .from("leads")
     .insert([
       {
-        email: "test@gmail.com",
-        message: "test message",
-        business_id: "777luckydraws",
+
+        email:
+          "test@gmail.com",
+
+        message:
+          "test message",
+
+        business_id:
+          "777luckydraws",
+
         user_email:
           "owner@777luckydraws.com"
+
       }
     ]);
 
@@ -394,12 +499,25 @@ app.get("/test-supabase", async (req, res) => {
 
 });
 
+// SERVER STATUS
+
+app.get("/", (req, res) => {
+
+  res.send(
+    "777 AI Backend Running"
+  );
+
+});
+
 // START SERVER
 
-app.listen(3000, () => {
+const PORT =
+  process.env.PORT || 3000;
+
+app.listen(PORT, () => {
 
   console.log(
-    "Server running on port 3000"
+    `Server running on port ${PORT}`
   );
 
 });
