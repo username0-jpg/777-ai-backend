@@ -17,29 +17,57 @@ async function signUp(
   password
 ) {
 
-  const {
-    data,
-    error
-  } = await supabaseClient.auth.signUp({
+  try {
 
-    email,
-    password
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .auth
+      .signUp({
 
-  });
+        email,
+        password,
 
-  if (error) {
+        options: {
 
-    alert(error.message);
+          emailRedirectTo:
+            window.location.origin +
+            "/dashboard.html"
 
-    return;
+        }
+
+      });
+
+    if (error) {
+
+      alert(
+        error.message
+      );
+
+      return;
+
+    }
+
+    // EMAIL VERIFICATION MESSAGE
+
+    alert(
+
+      "✅ Account created successfully!\n\nPlease check your email inbox to verify your account before logging in."
+
+    );
+
+    console.log(data);
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      "Signup failed."
+    );
 
   }
-
-  alert(
-    "Signup successful!"
-  );
-
-  console.log(data);
 
 }
 
@@ -50,32 +78,70 @@ async function login(
   password
 ) {
 
-  const {
-    data,
-    error
-  } = await supabaseClient.auth.signInWithPassword({
+  try {
 
-    email,
-    password
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .auth
+      .signInWithPassword({
 
-  });
+        email,
+        password
 
-  if (error) {
+      });
 
-    alert(error.message);
+    if (error) {
 
-    return;
+      // EMAIL NOT VERIFIED
+
+      if (
+
+        error.message.includes(
+          "Email not confirmed"
+        )
+
+      ) {
+
+        alert(
+
+          "⚠ Please verify your email before logging in.\n\nCheck your inbox."
+
+        );
+
+        return;
+
+      }
+
+      alert(
+        error.message
+      );
+
+      return;
+
+    }
+
+    console.log(data);
+
+    alert(
+      "✅ Logged in successfully!"
+    );
+
+    // REDIRECT
+
+    window.location.href =
+      "./dashboard.html";
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      "Login failed."
+    );
 
   }
-
-  alert(
-    "Logged in successfully!"
-  );
-
-  console.log(data);
-
-  window.location.href =
-    "./dashboard.html";
 
 }
 
@@ -83,25 +149,37 @@ async function login(
 
 async function googleLogin() {
 
-  const {
-    error
-  } = await supabaseClient.auth.signInWithOAuth({
+  try {
 
-    provider: "google",
+    const {
+      error
+    } = await supabaseClient
+      .auth
+      .signInWithOAuth({
 
-    options: {
+        provider: "google",
 
-      redirectTo:
-        window.location.origin +
-        "/dashboard.html"
+        options: {
+
+          redirectTo:
+            window.location.origin +
+            "/dashboard.html"
+
+        }
+
+      });
+
+    if (error) {
+
+      alert(
+        error.message
+      );
 
     }
 
-  });
+  } catch (error) {
 
-  if (error) {
-
-    alert(error.message);
+    console.log(error);
 
   }
 
@@ -111,10 +189,20 @@ async function googleLogin() {
 
 async function logout() {
 
-  await supabaseClient.auth.signOut();
+  try {
 
-  window.location.href =
-    "./login.html";
+    await supabaseClient
+      .auth
+      .signOut();
+
+    window.location.href =
+      "./login.html";
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
 
 }
 
@@ -122,19 +210,63 @@ async function logout() {
 
 async function checkUser() {
 
-  const {
-    data
-  } = await supabaseClient.auth.getUser();
+  try {
 
-  if (
-    !data.user
-  ) {
+    const {
+      data
+    } = await supabaseClient
+      .auth
+      .getUser();
 
-    window.location.href =
-      "./login.html";
+    if (
+      !data.user
+    ) {
+
+      window.location.href =
+        "./login.html";
+
+      return null;
+
+    }
+
+    return data.user;
+
+  } catch (error) {
+
+    console.log(error);
+
+    return null;
 
   }
 
-  return data.user;
+}
+
+// AUTO SESSION CHECK
+
+async function autoLoginRedirect() {
+
+  const {
+    data
+  } = await supabaseClient
+    .auth
+    .getSession();
+
+  // USER ALREADY LOGGED IN
+
+  if (
+    data.session &&
+    window.location.pathname.includes(
+      "login.html"
+    )
+  ) {
+
+    window.location.href =
+      "./dashboard.html";
+
+  }
 
 }
+
+// START AUTO CHECK
+
+autoLoginRedirect();
