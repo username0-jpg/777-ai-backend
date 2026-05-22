@@ -157,7 +157,7 @@
         font-weight:bold;
         font-size:17px;
       ">
-        777BotLtd
+        777Bot
       </div>
 
       <div style="
@@ -439,7 +439,7 @@ chat.appendChild(
               margin-bottom:5px;
               opacity:0.8;
             ">
-              🤖 777BotLtd
+              🤖 777Bot
             </div>
           `
             : ""
@@ -735,7 +735,7 @@ chat.appendChild(
 
       addMessage(
 
-        "Hi 👋 Welcome to 777BotLtd. How can I help you today?",
+        "Hi 👋 Welcome to 777Bot. How can I help you today?",
 
         false
 
