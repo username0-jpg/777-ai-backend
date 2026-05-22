@@ -1,689 +1,638 @@
-function initWidget() {
-
-  const currentScript =
-    document.querySelector(
-      'script[data-business]'
-    );
-
-  const businessId =
-    currentScript
-      ? currentScript.getAttribute(
-          "data-business"
-        )
-      : "777luckydraws";
-
-  let settings = null;
+(() => {
 
   const API_URL =
     "https://seven77luckydraws-ai.onrender.com";
 
-  // LOAD SETTINGS
+  const currentScript =
+    document.currentScript;
 
-  fetch(
-    `${API_URL}/settings?businessId=${businessId}`
-  )
-  .then((response) => response.json())
-  .then((data) => {
+  const businessId =
+    currentScript.getAttribute(
+      "data-business"
+    );
 
-    console.log(data);
+  if (!businessId) {
 
-    if (
-      !data ||
-      !data.business_name
-    ) {
+    console.error(
+      "Missing business ID"
+    );
 
-      alert(
-        "Business settings failed to load."
-      );
+    return;
 
-      return;
+  }
+
+  async function loadWidget() {
+
+    try {
+
+      const response =
+        await fetch(
+          `${API_URL}/settings?businessId=${businessId}`
+        );
+
+      const settings =
+        await response.json();
+
+      createWidget(settings);
+
+    } catch (error) {
+
+      console.log(error);
 
     }
 
-    settings = data;
-
-    startWidget();
-
-  })
-  .catch((error) => {
-
-    console.log(error);
-
-    alert(
-      "Failed to connect to server."
-    );
-
-  });
-
-  // START WIDGET
-
-  function startWidget() {
-
-    const widget =
-      document.createElement("div");
-
-    widget.innerHTML = `
-
-<div id="chat-button">
-  💬
-</div>
-
-<div id="chat-widget" class="closed">
-
-  <div id="chat-header">
-
-    <div id="header-left">
-
-      <div id="online-dot"></div>
-
-      <span>
-        ${settings.business_name} AI
-      </span>
-
-    </div>
-
-    <button id="close-chat">
-      ✕
-    </button>
-
-  </div>
-
-  <div id="welcome-screen">
-
-    <div id="welcome-content">
-
-      <h2>
-        👋 Welcome
-      </h2>
-
-      <p>
-        How can we help today?
-      </p>
-
-      <button id="start-chat">
-        Start Conversation
-      </button>
-
-    </div>
-
-  </div>
-
-  <div id="chat-container">
-
-    <div id="chat-messages">
-
-      <div class="message ai">
-        Hello 👋 How can I help you today?
-      </div>
-
-    </div>
-
-    <div id="typing-indicator">
-
-      <span></span>
-      <span></span>
-      <span></span>
-
-    </div>
-
-    <div id="bottom-area">
-
-      <div id="chat-input-area">
-
-        <input
-          id="chat-input"
-          placeholder="Type message..."
-        />
-
-        <button id="chat-send">
-          Send
-        </button>
-
-      </div>
-
-      <div id="chat-footer">
-        Powered by 777LuckyDrawsLTD
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<style>
-
-#chat-button {
-
-  position: fixed;
-
-  bottom: 20px;
-  right: 20px;
-
-  width: 65px;
-  height: 65px;
-
-  border-radius: 50%;
-
-  background:
-    ${settings.primary_color};
-
-  color: white;
-
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  font-size: 28px;
-
-  cursor: pointer;
-
-  z-index: 999999;
-
-  box-shadow:
-    0 0 25px rgba(0,0,0,0.35);
-
-  transition: 0.3s;
-
-}
-
-#chat-button:hover {
-
-  transform: scale(1.08);
-
-}
-
-#chat-widget {
-
-  position: fixed;
-
-  bottom: 100px;
-  right: 20px;
-
-  width: 350px;
-  height: 520px;
-
-  background: #111827;
-
-  border-radius: 20px;
-
-  overflow: hidden;
-
-  display: flex;
-  flex-direction: column;
-
-  font-family: Arial;
-
-  z-index: 999999;
-
-  box-shadow:
-    0 0 35px rgba(0,0,0,0.4);
-
-}
-
-#chat-widget.closed {
-
-  display: none;
-
-}
-
-#chat-header {
-
-  background:
-    ${settings.primary_color};
-
-  color: white;
-
-  padding: 15px;
-
-  display: flex;
-
-  justify-content: space-between;
-  align-items: center;
-
-  font-weight: bold;
-
-}
-
-#header-left {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-}
-
-#online-dot {
-
-  width: 10px;
-  height: 10px;
-
-  border-radius: 50%;
-
-  background: #22c55e;
-
-  box-shadow:
-    0 0 10px #22c55e;
-
-}
-
-#close-chat {
-
-  background: transparent;
-
-  border: none;
-
-  color: white;
-
-  font-size: 18px;
-
-  cursor: pointer;
-
-}
-
-#welcome-screen {
-
-  flex: 1;
-
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  text-align: center;
-
-  color: white;
-
-  padding: 30px;
-
-}
-
-#welcome-content h2 {
-
-  margin-bottom: 10px;
-
-}
-
-#welcome-content p {
-
-  margin-bottom: 20px;
-
-  color: #d1d5db;
-
-}
-
-#start-chat {
-
-  padding: 12px 20px;
-
-  border: none;
-
-  border-radius: 10px;
-
-  background:
-    ${settings.primary_color};
-
-  color: white;
-
-  cursor: pointer;
-
-  font-weight: bold;
-
-}
-
-#chat-container {
-
-  display: none;
-
-  flex-direction: column;
-
-  flex: 1;
-
-  overflow: hidden;
-
-}
-
-#chat-messages {
-
-  flex: 1;
-
-  overflow-y: auto;
-
-  overflow-x: hidden;
-
-  padding: 15px;
-
-  color: white;
-
-  scroll-behavior: smooth;
-
-}
-
-.message {
-
-  margin-bottom: 10px;
-
-  padding: 12px;
-
-  border-radius: 12px;
-
-  max-width: 85%;
-
-  line-height: 1.4;
-
-  word-wrap: break-word;
-
-  animation:
-    fadeIn 0.25s ease;
-
-}
-
-.user {
-
-  background:
-    ${settings.primary_color};
-
-  margin-left: auto;
-
-}
-
-.ai {
-
-  background: #374151;
-
-}
-
-#typing-indicator {
-
-  display: none;
-
-  align-items: center;
-
-  gap: 6px;
-
-  padding: 12px 15px;
-
-}
-
-#typing-indicator span {
-
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-
-  background: #9ca3af;
-
-  animation:
-    typingBounce 1.2s infinite ease-in-out;
-
-}
-
-#typing-indicator span:nth-child(2) {
-
-  animation-delay: 0.2s;
-
-}
-
-#typing-indicator span:nth-child(3) {
-
-  animation-delay: 0.4s;
-
-}
-
-@keyframes typingBounce {
-
-  0%, 80%, 100% {
-
-    transform: scale(0.7);
-
-    opacity: 0.5;
-
   }
 
-  40% {
+  function createWidget(settings) {
 
-    transform: scale(1);
-
-    opacity: 1;
-
-  }
-
-}
-
-@keyframes fadeIn {
-
-  from {
-
-    opacity: 0;
-
-    transform: translateY(10px);
-
-  }
-
-  to {
-
-    opacity: 1;
-
-    transform: translateY(0);
-
-  }
-
-}
-
-#bottom-area {
-
-  background: #1f2937;
-
-}
-
-#chat-input-area {
-
-  display: flex;
-
-  padding: 10px;
-
-  gap: 10px;
-
-}
-
-#chat-input {
-
-  flex: 1;
-
-  padding: 12px;
-
-  border: none;
-
-  border-radius: 10px;
-
-  background: #374151;
-
-  color: white;
-
-  outline: none;
-
-}
-
-#chat-send {
-
-  padding: 12px 15px;
-
-  background:
-    ${settings.primary_color};
-
-  color: white;
-
-  border: none;
-
-  border-radius: 10px;
-
-  cursor: pointer;
-
-  font-weight: bold;
-
-  transition: 0.2s;
-
-}
-
-#chat-send:hover {
-
-  opacity: 0.9;
-
-}
-
-#chat-send:disabled {
-
-  opacity: 0.5;
-
-  cursor: not-allowed;
-
-}
-
-#chat-footer {
-
-  text-align: center;
-
-  padding: 8px;
-
-  font-size: 11px;
-
-  color: #9ca3af;
-
-  background: #0f172a;
-
-}
-
-</style>
-
-`;
-
-    document.body.appendChild(widget);
-
-    // ELEMENTS
-
-    const chatWidget =
-      document.getElementById(
-        "chat-widget"
-      );
-
-    const chatButton =
-      document.getElementById(
-        "chat-button"
-      );
-
-    const closeButton =
-      document.getElementById(
-        "close-chat"
-      );
-
-    const welcomeScreen =
-      document.getElementById(
-        "welcome-screen"
-      );
-
-    const chatContainer =
-      document.getElementById(
-        "chat-container"
-      );
-
-    const startChatButton =
-      document.getElementById(
-        "start-chat"
-      );
-
-    const messages =
-      document.getElementById(
-        "chat-messages"
-      );
-
-    const input =
-      document.getElementById(
-        "chat-input"
-      );
+    // BUTTON
 
     const button =
-      document.getElementById(
-        "chat-send"
-      );
+      document.createElement("button");
 
-    const typingIndicator =
-      document.getElementById(
-        "typing-indicator"
-      );
+    button.innerHTML =
+      "💬";
 
-    // OPEN CHAT
+    Object.assign(
+      button.style,
+      {
 
-    chatButton.onclick = () => {
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        width: "72px",
+        height: "72px",
+        borderRadius: "50%",
+        border: "none",
+        background:
+          settings.primary_color ||
+          "#dc2626",
+        color: "white",
+        fontSize: "30px",
+        cursor: "pointer",
+        zIndex: "999999",
+        boxShadow:
+          "0 15px 35px rgba(0,0,0,0.3)",
+        transition:
+          "all 0.25s ease"
 
-      chatWidget.classList.remove(
-        "closed"
-      );
+      }
+    );
 
-      chatButton.style.display =
+    document.body.appendChild(
+      button
+    );
+
+    // CHAT
+
+    const chat =
+      document.createElement("div");
+
+    Object.assign(
+      chat.style,
+      {
+
+        position: "fixed",
+        bottom: "105px",
+        right: "20px",
+        width: "360px",
+        height: "540px",
+        background: "#111827",
+        borderRadius: "26px",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        zIndex: "999999",
+        boxShadow:
+          "0 25px 50px rgba(0,0,0,0.35)",
+        border:
+          "1px solid rgba(255,255,255,0.06)",
+
+        opacity: "0",
+        transform:
+          "translateY(20px) scale(0.95)",
+
+        pointerEvents: "none",
+
+        transition:
+          "all 0.25s ease"
+
+      }
+    );
+
+    document.body.appendChild(
+      chat
+    );
+
+    // HEADER
+
+    const header =
+      document.createElement("div");
+
+    Object.assign(
+      header.style,
+      {
+
+        padding: "18px",
+        background:
+          settings.primary_color ||
+          "#dc2626",
+        color: "white",
+        display: "flex",
+        justifyContent:
+          "space-between",
+        alignItems:
+          "center"
+
+      }
+    );
+
+    // TITLE
+
+    const title =
+      document.createElement("div");
+
+    title.innerHTML = `
+      <div style="
+        font-weight:bold;
+        font-size:17px;
+      ">
+        777BotLtd
+      </div>
+
+      <div style="
+        font-size:12px;
+        opacity:0.8;
+        margin-top:3px;
+      ">
+        AI Assistant • Online
+      </div>
+    `;
+
+    header.appendChild(title);
+
+    // MINIMIZE
+
+    const minimize =
+      document.createElement("button");
+
+    minimize.innerHTML = "—";
+
+    Object.assign(
+      minimize.style,
+      {
+
+        background: "transparent",
+        border: "none",
+        color: "white",
+        fontSize: "22px",
+        cursor: "pointer"
+
+      }
+    );
+
+    header.appendChild(
+      minimize
+    );
+
+    chat.appendChild(header);
+
+    // MESSAGES
+
+    const messages =
+      document.createElement("div");
+
+    Object.assign(
+      messages.style,
+      {
+
+        flex: "1",
+        padding: "15px",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+        background: "#0f172a"
+
+      }
+    );
+
+    chat.appendChild(messages);
+
+    // INPUT AREA
+
+    const inputArea =
+      document.createElement("div");
+
+    Object.assign(
+      inputArea.style,
+      {
+
+        padding: "15px",
+        display: "flex",
+        gap: "10px",
+        background: "#111827"
+
+      }
+    );
+
+    chat.appendChild(inputArea);
+
+    // INPUT
+
+    const input =
+      document.createElement("input");
+
+    input.placeholder =
+      "Type your message...";
+
+    Object.assign(
+      input.style,
+      {
+
+        flex: "1",
+        padding: "14px",
+        borderRadius: "14px",
+        border: "none",
+        outline: "none",
+        background: "#1f2937",
+        color: "white",
+        fontSize: "14px"
+
+      }
+    );
+
+    inputArea.appendChild(input);
+
+    // SEND
+
+    const send =
+      document.createElement("button");
+
+    send.innerHTML =
+      "➜";
+
+    Object.assign(
+      send.style,
+      {
+
+        width: "54px",
+        border: "none",
+        borderRadius: "14px",
+        background:
+          settings.primary_color ||
+          "#dc2626",
+        color: "white",
+        cursor: "pointer",
+        fontSize: "18px"
+
+      }
+    );
+
+    inputArea.appendChild(send);
+
+    // OPEN STATE
+
+    let isOpen = false;
+
+    button.onclick = () => {
+
+      isOpen = !isOpen;
+
+      if (isOpen) {
+
+        chat.style.opacity =
+          "1";
+
+        chat.style.transform =
+          "translateY(0) scale(1)";
+
+        chat.style.pointerEvents =
+          "all";
+
+      } else {
+
+        closeWidget();
+
+      }
+
+    };
+
+    minimize.onclick =
+      closeWidget;
+
+    function closeWidget() {
+
+      isOpen = false;
+
+      chat.style.opacity =
+        "0";
+
+      chat.style.transform =
+        "translateY(20px) scale(0.95)";
+
+      chat.style.pointerEvents =
         "none";
 
-    };
+    }
 
-    // CLOSE CHAT
+    // TIMESTAMP
 
-    closeButton.onclick = () => {
+    function getTime() {
 
-      chatWidget.classList.add(
-        "closed"
+      return new Date()
+        .toLocaleTimeString(
+          [],
+          {
+
+            hour: "2-digit",
+            minute: "2-digit"
+
+          }
+        );
+
+    }
+
+    // SAVE CHAT
+
+    function saveMessages() {
+
+      localStorage.setItem(
+
+        `chat_${businessId}`,
+
+        messages.innerHTML
+
       );
 
-      chatButton.style.display =
+    }
+
+    // LOAD CHAT
+
+    const oldMessages =
+      localStorage.getItem(
+        `chat_${businessId}`
+      );
+
+    if (oldMessages) {
+
+      messages.innerHTML =
+        oldMessages;
+
+    }
+
+    // MESSAGE
+
+    function addMessage(
+      text,
+      isUser
+    ) {
+
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.style.display =
         "flex";
 
-    };
+      wrapper.style.flexDirection =
+        "column";
 
-    // START CHAT
+      wrapper.style.alignItems =
+        isUser
+          ? "flex-end"
+          : "flex-start";
 
-    startChatButton.onclick = () => {
+      const bubble =
+        document.createElement("div");
 
-      welcomeScreen.style.display =
-        "none";
+      bubble.innerHTML = `
+        ${
+          !isUser
+            ? `
+            <div style="
+              font-size:12px;
+              margin-bottom:5px;
+              opacity:0.8;
+            ">
+              🤖 777BotLtd
+            </div>
+          `
+            : ""
+        }
 
-      chatContainer.style.display =
-        "flex";
+        <div>
+          ${text}
+        </div>
 
-      input.focus();
+        <div style="
+          font-size:11px;
+          opacity:0.65;
+          margin-top:6px;
+        ">
+          ${getTime()}
+        </div>
+      `;
 
-    };
+      Object.assign(
+        bubble.style,
+        {
+
+          maxWidth: "82%",
+          padding: "13px 15px",
+          borderRadius: "18px",
+          background:
+            isUser
+              ? settings.primary_color
+              : "#1f2937",
+          color: "white",
+          fontSize: "14px",
+          lineHeight: "1.5",
+          wordBreak:
+            "break-word"
+
+        }
+      );
+
+      wrapper.appendChild(
+        bubble
+      );
+
+      messages.appendChild(
+        wrapper
+      );
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+      saveMessages();
+
+    }
+
+    // TYPING DOTS
+
+    function addTyping() {
+
+      const typing =
+        document.createElement("div");
+
+      typing.id =
+        "typing";
+
+      typing.innerHTML = `
+        <div style="
+          display:flex;
+          gap:5px;
+          padding:12px;
+        ">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      `;
+
+      messages.appendChild(
+        typing
+      );
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+      return typing;
+
+    }
+
+    // STYLE DOTS
+
+    const style =
+      document.createElement("style");
+
+    style.innerHTML = `
+
+      .dot {
+
+        width:8px;
+        height:8px;
+
+        background:#9ca3af;
+
+        border-radius:50%;
+
+        animation:
+          bounce 1s infinite;
+
+      }
+
+      .dot:nth-child(2) {
+
+        animation-delay:0.2s;
+
+      }
+
+      .dot:nth-child(3) {
+
+        animation-delay:0.4s;
+
+      }
+
+      @keyframes bounce {
+
+        0%, 80%, 100% {
+
+          transform:
+            translateY(0);
+
+        }
+
+        40% {
+
+          transform:
+            translateY(-6px);
+
+        }
+
+      }
+
+      @media (max-width: 500px) {
+
+        .mobile-widget {
+
+          width:calc(100vw - 20px) !important;
+
+          right:10px !important;
+
+          bottom:90px !important;
+
+        }
+
+      }
+
+    `;
+
+    document.head.appendChild(
+      style
+    );
+
+    chat.classList.add(
+      "mobile-widget"
+    );
 
     // SEND MESSAGE
 
     async function sendMessage() {
 
-      const message =
+      const text =
         input.value.trim();
 
-      if (!message) return;
+      if (!text) return;
 
-      messages.innerHTML += `
-
-        <div class="message user">
-          ${message}
-        </div>
-
-      `;
+      addMessage(
+        text,
+        true
+      );
 
       input.value = "";
 
-      typingIndicator.style.display =
-        "flex";
+      // LEAD DETECTION
 
-      button.disabled = true;
+      const emailRegex =
+        /\S+@\S+\.\S+/;
 
-      button.innerHTML =
-        "...";
+      if (
+        emailRegex.test(text)
+      ) {
 
-      messages.scrollTop =
-        messages.scrollHeight;
+        await fetch(
+          `${API_URL}/lead`,
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body: JSON.stringify({
+
+              email: text.match(
+                emailRegex
+              )[0],
+
+              message: text,
+
+              businessId
+
+            })
+
+          }
+        );
+
+      }
+
+      const typing =
+        addTyping();
 
       try {
 
@@ -691,20 +640,21 @@ function initWidget() {
           await fetch(
             `${API_URL}/chat`,
             {
+
               method: "POST",
 
               headers: {
+
                 "Content-Type":
                   "application/json"
+
               },
 
               body: JSON.stringify({
 
-                message,
-                businessId,
+                message: text,
 
-                userEmail:
-                  settings.user_email
+                businessId
 
               })
 
@@ -714,52 +664,30 @@ function initWidget() {
         const data =
           await response.json();
 
-        typingIndicator.style.display =
-          "none";
+        typing.remove();
 
-        button.disabled = false;
-
-        button.innerHTML =
-          "Send";
-
-        const aiReply =
-          data.reply ||
-          data.error ||
-          "AI failed to respond.";
-
-        messages.innerHTML += `
-
-          <div class="message ai">
-            ${aiReply}
-          </div>
-
-        `;
-
-        messages.scrollTop =
-          messages.scrollHeight;
+        addMessage(
+          data.reply,
+          false
+        );
 
       } catch (error) {
 
-        console.log(error);
+        typing.remove();
 
-        typingIndicator.style.display =
-          "none";
-
-        button.disabled = false;
-
-        button.innerHTML =
-          "Send";
+        addMessage(
+          "Something went wrong.",
+          false
+        );
 
       }
 
     }
 
-    // BUTTON CLICK
+    // EVENTS
 
-    button.onclick =
+    send.onclick =
       sendMessage;
-
-    // ENTER KEY
 
     input.addEventListener(
       "keypress",
@@ -776,22 +704,22 @@ function initWidget() {
       }
     );
 
+    // WELCOME MESSAGE
+
+    if (!oldMessages) {
+
+      addMessage(
+
+        "Hi 👋 Welcome to 777BotLtd. How can I help you today?",
+
+        false
+
+      );
+
+    }
+
   }
 
-}
+  loadWidget();
 
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    initWidget
-  );
-
-} else {
-
-  initWidget();
-
-}
+})();
