@@ -235,7 +235,32 @@
 
       }
     );
+// FOOTER
 
+const footer =
+  document.createElement("div");
+
+footer.innerHTML =
+  "Powered by 777BotLtd";
+
+Object.assign(
+  footer.style,
+  {
+
+    textAlign: "center",
+    fontSize: "11px",
+    padding: "10px",
+    color: "#9ca3af",
+    background: "#111827",
+    borderTop:
+      "1px solid rgba(255,255,255,0.05)"
+
+  }
+);
+
+chat.appendChild(
+  footer
+);
     chat.appendChild(inputArea);
 
     // INPUT
