@@ -47,7 +47,8 @@ const resend =
 // CHAT ROUTE
 
 app.post("/chat", async (req, res) => {
-
+console.log("CHAT ROUTE HIT");
+console.log(req.body);
   try {
 
     const userMessage =
@@ -106,7 +107,7 @@ if (emailMatch) {
     ]);
 
   try {
-
+console.log("ATTEMPTING TO SEND EMAIL");
     await resend.emails.send({
 
       from:
