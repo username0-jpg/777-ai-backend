@@ -439,7 +439,7 @@ chat.appendChild(
               margin-bottom:5px;
               opacity:0.8;
             ">
-              🤖 777Bot
+               777Bot
             </div>
           `
             : ""

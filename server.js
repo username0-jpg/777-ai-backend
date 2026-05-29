@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
-
+const { Resend } = require("resend");
 const {
   createClient
 } = require("@supabase/supabase-js");
@@ -38,7 +38,12 @@ const supabase =
     supabaseUrl,
     supabaseKey
   );
-
+const resend =
+  new Resend(
+    process.env.RESEND_API_KEY
+  );
+  const NOTIFY_EMAIL =
+  "777ltdcompany@gmail.com";
 // CHAT ROUTE
 
 app.post("/chat", async (req, res) => {
@@ -84,30 +89,71 @@ app.post("/chat", async (req, res) => {
       );
 
     // SAVE LEAD
+if (emailMatch) {
 
-    if (emailMatch) {
+  const leadEmail =
+    emailMatch[0];
 
-      await supabase
-        .from("leads")
-        .insert([
-          {
+  await supabase
+    .from("leads")
+    .insert([
+      {
+        email: leadEmail,
+        message: userMessage,
+        business_id: businessId,
+        user_email: userEmail
+      }
+    ]);
 
-            email:
-              emailMatch[0],
+  try {
 
-            message:
-              userMessage,
+    await resend.emails.send({
 
-            business_id:
-              businessId,
+      from:
+        "777Bot <onboarding@resend.dev>",
 
-            user_email:
-              userEmail
+      to:
+        NOTIFY_EMAIL,
 
-          }
-        ]);
+      subject:
+        "🔥 New Lead Captured",
 
-    }
+      html: `
+
+        <h2>New Lead</h2>
+
+        <p>
+          <strong>Email:</strong>
+          ${leadEmail}
+        </p>
+
+        <p>
+          <strong>Message:</strong>
+          ${userMessage}
+        </p>
+
+        <p>
+          <strong>Business:</strong>
+          ${businessId}
+        </p>
+
+      `
+
+    });
+
+  } catch (err) {
+
+    console.log(
+      "Email Error:",
+      err
+    );
+
+  }
+
+}
+  
+
+    
 
     // AI RESPONSE
 
