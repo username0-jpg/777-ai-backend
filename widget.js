@@ -1,7 +1,7 @@
 (() => {
 
   const API_URL =
-    "https://seven77luckydraws-ai.onrender.com";
+    "https://seven77-ai-backend.onrender.com";
 
   const currentScript =
     document.currentScript;
