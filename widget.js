@@ -20,7 +20,7 @@
     return;
 
   }
-
+console.log("WIDGET VERSION 2.1");
   async function loadWidget() {
 
     try {
@@ -619,42 +619,7 @@ chat.appendChild(
 
       // LEAD DETECTION
 
-      const emailRegex =
-        /\S+@\S+\.\S+/;
-
-      if (
-        emailRegex.test(text)
-      ) {
-
-        await fetch(
-          `${API_URL}/lead`,
-          {
-
-            method: "POST",
-
-            headers: {
-
-              "Content-Type":
-                "application/json"
-
-            },
-
-            body: JSON.stringify({
-
-              email: text.match(
-                emailRegex
-              )[0],
-
-              message: text,
-
-              businessId
-
-            })
-
-          }
-        );
-
-      }
+  
 
       const typing =
         addTyping();
