@@ -107,55 +107,41 @@ if (emailMatch) {
     ]);
 
   try {
-console.log("ATTEMPTING TO SEND EMAIL");
-    await resend.emails.send({
+console.log("RESEND KEY EXISTS:", !!process.env.RESEND_API_KEY);
+console.log("NOTIFY EMAIL:", NOTIFY_EMAIL);
+console.log("DEBUG TEST 777");
+  const result = await resend.emails.send({
 
-      from:
-        "777Bot <onboarding@resend.dev>",
+    from: "777Bot <onboarding@resend.dev>",
 
-      to:
-        NOTIFY_EMAIL,
+    to: NOTIFY_EMAIL,
 
-      subject:
-        "🔥 New Lead Captured",
+    subject: "🔥 New Lead Captured",
 
-      html: `
+    html: `
+      <h2>New Lead</h2>
 
-        <h2>New Lead</h2>
+      <p><strong>Email:</strong> ${leadEmail}</p>
 
-        <p>
-          <strong>Email:</strong>
-          ${leadEmail}
-        </p>
+      <p><strong>Message:</strong> ${userMessage}</p>
 
-        <p>
-          <strong>Message:</strong>
-          ${userMessage}
-        </p>
+      <p><strong>Business:</strong> ${businessId}</p>
+    `
 
-        <p>
-          <strong>Business:</strong>
-          ${businessId}
-        </p>
+  });
 
-      `
+  console.log("EMAIL RESULT");
+  console.log(result);
 
-    });
+} catch (err) {
 
-  } catch (err) {
-
-    console.log(
-      "Email Error:",
-      err
-    );
-
-  }
+  console.log("EMAIL ERROR");
+  console.log(err);
 
 }
-  
 
-    
-
+ 
+}
     // AI RESPONSE
 
     const completion =
