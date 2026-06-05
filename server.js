@@ -43,7 +43,7 @@ const resend =
     process.env.RESEND_API_KEY
   );
   const NOTIFY_EMAIL =
-  "777ltdcompany@gmail.com";
+  "bell89770@gmail.com";
 // CHAT ROUTE
 
 app.post("/chat", async (req, res) => {
