@@ -585,7 +585,40 @@ app.get("/test-supabase", async (req, res) => {
 });
 
 // SERVER STATUS
+app.get("/test-email", async (req, res) => {
 
+  try {
+
+    const result =
+      await resend.emails.send({
+
+        from:
+          "777Bot <onboarding@resend.dev>",
+
+        to:
+          "777ltdcompany@gmail.com",
+
+        subject:
+          "777BotLtd Email Test",
+
+        html:
+          "<h1>Email system working</h1>"
+
+      });
+
+    console.log(result);
+
+    res.json(result);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json(error);
+
+  }
+
+});
 app.get("/", (req, res) => {
 
   res.send(
